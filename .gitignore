@@ -1,0 +1,44 @@
+# --- Maven / Java ---
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/wrapper/maven-wrapper.jar
+.mvn/jvm.config
+.mvn/maven.config
+
+# --- Node / Frontend ---
+node_modules/
+jam-frontend/node_modules/
+jam-frontend/dist/
+jam-frontend/dist-ssr/
+jam-frontend/*.local
+jam-frontend/.env*
+!jam-frontend/.env.example
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- IDEs / Editors ---
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.settings/
+.classpath
+.factorypath
+.DS_Store
+
+# --- Secrets / Environment ---
+.env
+.env.local
+application.local.properties
