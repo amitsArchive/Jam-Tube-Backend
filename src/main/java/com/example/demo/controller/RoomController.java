@@ -26,7 +26,11 @@ public class RoomController {
     @MessageMapping("/room/{roomId}/join")
     // Spring atutomatically broadcasts the return value on /topic/room/{roomId}
     @SendTo("/topic/room/{roomId}")
-    public Set<String> joinRoom(@DestinationVariable String roomId, JoinRequest joinRequest) {
+    public Set<String> joinRoom(@DestinationVariable String roomId, JoinRequest joinRequest, org.springframework.messaging.simp.SimpMessageHeaderAccessor headerAccessor) {
+        // Save metadata in session to handle "Disconnect" cleanup later
+        headerAccessor.getSessionAttributes().put("username", joinRequest.getUsername());
+        headerAccessor.getSessionAttributes().put("roomId", roomId);
+        
         return jamSessionService.addUserToRoom(roomId, joinRequest.getUsername());
     }
 

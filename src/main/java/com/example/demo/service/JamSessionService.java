@@ -1,39 +1,69 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.JamRoom;
+import com.example.demo.entity.JamRoomRepository;
 import com.example.demo.entity.SearchResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class JamSessionService {
-    private final ConcurrentHashMap<String, Set<String>> roomUsers = new ConcurrentHashMap<>();
 
-    // NEW: Queue state (Maps Room ID to a List of SearchResult objects)
-    private final ConcurrentHashMap<String, List<SearchResult>> roomQueues = new ConcurrentHashMap<>();
+    private final JamRoomRepository jamRoomRepository;
+
+    @Transactional
+    public JamRoom createRoom(String hostUsername) {
+        String roomId = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        JamRoom room = new JamRoom(roomId, hostUsername);
+        return jamRoomRepository.save(room);
+    }
+
+    public Optional<JamRoom> getRoom(String roomId) {
+        return jamRoomRepository.findById(roomId);
+    }
+
+    @Transactional
+    public void deleteRoom(String roomId) {
+
+        jamRoomRepository.deleteById(roomId);
+    }
+
+    @Transactional
+    public void removeUserFromRoom(String roomId, String username) {
+        jamRoomRepository.findById(roomId).ifPresent(room -> {
+            room.getUsers().remove(username);
+            jamRoomRepository.save(room);
+        });
+    }
+
+    @Transactional
     public Set<String> addUserToRoom(String roomId, String username) {
-        if (roomId == null || username == null) {
-            return roomUsers.getOrDefault(roomId, ConcurrentHashMap.newKeySet());
-        }
-        roomUsers.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(username);
-        return roomUsers.get(roomId);
+        return jamRoomRepository.findById(roomId).map(room -> {
+            room.getUsers().add(username);
+            return jamRoomRepository.save(room).getUsers();
+        }).orElse(Collections.emptySet());
     }
 
-    public List<SearchResult> addVideoToQueue(String roomId, SearchResult video){
-        roomQueues.computeIfAbsent(roomId, k -> new CopyOnWriteArrayList<>()).add(video);
-        return roomQueues.get(roomId);
+    @Transactional
+    public List<SearchResult> addVideoToQueue(String roomId, SearchResult video) {
+        return jamRoomRepository.findById(roomId).map(room -> {
+            room.getQueue().add(video);
+            return jamRoomRepository.save(room).getQueue();
+        }).orElse(Collections.emptyList());
     }
 
-    // Remove the first video from the line (when it finishes playing)
-    public List<SearchResult> popVideoFromQueue(String roomId){
-        List<SearchResult> queue = roomQueues.get(roomId);
-        if (queue != null && !queue.isEmpty()) {
-            queue.remove(0);
-        }
-        return queue == null ? new ArrayList<>() : queue;
+    @Transactional
+    public List<SearchResult> popVideoFromQueue(String roomId) {
+        return jamRoomRepository.findById(roomId).map(room -> {
+            if (!room.getQueue().isEmpty()) {
+                room.getQueue().remove(0);
+                return jamRoomRepository.save(room).getQueue();
+            }
+            return room.getQueue();
+        }).orElse(Collections.emptyList());
     }
 }
