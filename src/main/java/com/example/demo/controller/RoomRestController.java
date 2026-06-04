@@ -16,7 +16,6 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/rooms")
-@CrossOrigin(origins = "http://localhost:5173") // Connects to the React frontend
 @RequiredArgsConstructor
 public class RoomRestController {
 
