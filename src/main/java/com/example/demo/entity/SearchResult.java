@@ -1,6 +1,6 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
+@MappedSuperclass
 public class SearchResult {
     private String videoId;
     private String title;

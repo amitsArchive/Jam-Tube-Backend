@@ -9,4 +9,5 @@ public class PlaybackEvent {
     private String action;
     private Double timestamp;
     private String videoId;
+    private String username;
 }

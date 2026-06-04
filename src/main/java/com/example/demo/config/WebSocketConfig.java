@@ -23,10 +23,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         //Register a URL where browser can initiate WebSocket connection.
         //Browser hits http://localhost:8080/ws to start handshake.
         registry.addEndpoint("/ws")
-                //Who is allowed to connect?
-                //"*" = everyone. Any domain, any origin.
-                .setAllowedOriginPatterns("*");
-                //"If browser doesn't support WebSocket, fall back to older techniques automatically."
-                // .withSockJS();
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }

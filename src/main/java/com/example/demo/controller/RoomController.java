@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.JoinRequest;
 import com.example.demo.entity.PlaybackEvent;
-import com.example.demo.entity.SearchResult;
+import com.example.demo.entity.QueueVideo;
 import com.example.demo.service.JamSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Controller
@@ -44,14 +45,17 @@ public class RoomController {
 
     @MessageMapping("/room/{roomId}/queue/add")
     @SendTo("/topic/room/{roomId}/queue")
-    public List<SearchResult> addToQueue(@DestinationVariable String roomId, @Payload SearchResult video){
+    public List<QueueVideo> addToQueue(@DestinationVariable String roomId, @Payload QueueVideo video){
         return jamSessionService.addVideoToQueue(roomId, video);
     }
 
     @MessageMapping("/room/{roomId}/queue/next")
     @SendTo("/topic/room/{roomId}/queue")
-    public List<SearchResult> nextInQueue(@DestinationVariable String roomId) {
-        return jamSessionService.popVideoFromQueue(roomId);
+    public List<QueueVideo> nextInQueue(
+            @DestinationVariable String roomId,
+            @Payload(required = false) Map<String, String> body) {
+        String videoId = body != null ? body.get("videoId") : null;
+        return jamSessionService.popVideoFromQueue(roomId, videoId);
     }
 
 }
